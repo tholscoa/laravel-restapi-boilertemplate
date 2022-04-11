@@ -30,6 +30,10 @@ class PermissionController extends Controller
 
     }
 
+    /**
+     * Endpoint to get authenticated user permissions 
+     * @return JSONResponse
+     */
     public static function getMyPermissions(){
         $userCan = Auth::user()->can('view-permissions');
         if($userCan){
@@ -40,6 +44,10 @@ class PermissionController extends Controller
 
     }
 
+    /**
+     * Endpoint to get all available permissions 
+     * @return JSONResponse
+     */
     public static function getAllPermissions(){
         $userCan = Auth::user()->can('view-all-permissions');
         if($userCan){
@@ -52,9 +60,39 @@ class PermissionController extends Controller
     
     /**
      * Assign new permission to user
+     * action only allows assign or revoke
      * @param email|email|required This the email of the user you want to assign permission to
-     * @param permission_id|string|required Permission Id to be assigned to the user
-     * @return JSONResponse
+     * @param permissions|array|required Permission name or id to be assigned to the user
+     * @Response {
+    *"status": true,
+    *"message": "Permission(s) successfully revoked",
+    *"data": [
+    *    {
+    *        "id": 1,
+    *        "name": "create-permissions",
+    *        "guard_name": "api",
+    *        "created_at": "2022-04-08T17:40:17.000000Z",
+    *        "updated_at": "2022-04-08T17:40:17.000000Z",
+    *        "pivot": {
+    *            "model_id": 1,
+    *            "permission_id": 1,
+    *            "model_type": "App\\Models\\User"
+    *        }
+    *    },
+    *    {
+    *        "id": 9,
+    *        "name": "super-admin",
+    *        "guard_name": "web",
+    *        "created_at": "2022-04-08T18:18:45.000000Z",
+    *        "updated_at": "2022-04-08T18:18:45.000000Z",
+    *        "pivot": {
+    *            "model_id": 1,
+    *            "permission_id": 9,
+    *            "model_type": "App\\Models\\User"
+    *        }
+    *    }
+    *]
+*}
      */
 
     public function assignRevokePermissions($action, Request $request)
