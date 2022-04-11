@@ -1,0 +1,337 @@
+openapi: 3.0.3
+info:
+  title: 'Laravel Boilerplate API Documentation'
+  description: 'The purpose for this project is to create a template that take care of your basic authentication, modularization and permissions'
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost'
+paths:
+  /api/user:
+    get:
+      summary: ''
+      description: ''
+      parameters:
+        -
+          in: header
+          name: Content-Type
+          description: ''
+          example: application/json
+          schema:
+            type: string
+        -
+          in: header
+          name: Accept
+          description: ''
+          example: application/json
+          schema:
+            type: string
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/auth:
+    get:
+      summary: ''
+      description: ''
+      parameters:
+        -
+          in: header
+          name: Content-Type
+          description: ''
+          example: application/json
+          schema:
+            type: string
+        -
+          in: header
+          name: Accept
+          description: ''
+          example: application/json
+          schema:
+            type: string
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/user/register:
+    post:
+      summary: 'User registration endpoint'
+      description: ''
+      parameters:
+        -
+          in: header
+          name: Content-Type
+          description: ''
+          example: application/json
+          schema:
+            type: string
+        -
+          in: header
+          name: Accept
+          description: ''
+          example: application/json
+          schema:
+            type: string
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: porro
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: delbert86@example.org
+                password:
+                  type: string
+                  description: ''
+                  example: non
+              required:
+                - name
+                - email
+                - password
+      security: []
+  '/api/user/profile/{id}':
+    get:
+      summary: 'Endpoint to show authenticated user profile.'
+      description: ''
+      parameters:
+        -
+          in: header
+          name: Content-Type
+          description: ''
+          example: application/json
+          schema:
+            type: string
+        -
+          in: header
+          name: Accept
+          description: ''
+          example: application/json
+          schema:
+            type: string
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the profile.'
+        example: aut
+        required: true
+        schema:
+          type: string
+  /api/user/permissions:
+    get:
+      summary: 'Endpoint to get all available permissions'
+      description: ''
+      parameters:
+        -
+          in: header
+          name: Content-Type
+          description: ''
+          example: application/json
+          schema:
+            type: string
+        -
+          in: header
+          name: Accept
+          description: ''
+          example: application/json
+          schema:
+            type: string
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/user/permissions/self:
+    get:
+      summary: 'Endpoint to get authenticated user permissions'
+      description: ''
+      parameters:
+        -
+          in: header
+          name: Content-Type
+          description: ''
+          example: application/json
+          schema:
+            type: string
+        -
+          in: header
+          name: Accept
+          description: ''
+          example: application/json
+          schema:
+            type: string
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/user/permissions/{action}':
+    post:
+      summary: "Assign new permission to user\naction only allows assign or revoke"
+      description: ''
+      parameters:
+        -
+          in: header
+          name: Content-Type
+          description: ''
+          example: application/json
+          schema:
+            type: string
+        -
+          in: header
+          name: Accept
+          description: ''
+          example: application/json
+          schema:
+            type: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: true
+                  message: 'Permission(s) successfully revoked'
+                  data:
+                    -
+                      id: 1
+                      name: create-permissions
+                      guard_name: api
+                      created_at: '2022-04-08T17:40:17.000000Z'
+                      updated_at: '2022-04-08T17:40:17.000000Z'
+                      pivot:
+                        model_id: 1
+                        permission_id: 1
+                        model_type: App\Models\User
+                    -
+                      id: 9
+                      name: super-admin
+                      guard_name: web
+                      created_at: '2022-04-08T18:18:45.000000Z'
+                      updated_at: '2022-04-08T18:18:45.000000Z'
+                      pivot:
+                        model_id: 1
+                        permission_id: 9
+                        model_type: App\Models\User
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Permission(s) successfully revoked'
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        name: create-permissions
+                        guard_name: api
+                        created_at: '2022-04-08T17:40:17.000000Z'
+                        updated_at: '2022-04-08T17:40:17.000000Z'
+                        pivot:
+                          model_id: 1
+                          permission_id: 1
+                          model_type: App\Models\User
+                      -
+                        id: 9
+                        name: super-admin
+                        guard_name: web
+                        created_at: '2022-04-08T18:18:45.000000Z'
+                        updated_at: '2022-04-08T18:18:45.000000Z'
+                        pivot:
+                          model_id: 1
+                          permission_id: 9
+                          model_type: App\Models\User
+                    items:
+                      type: object
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: action
+        description: ''
+        example: asperiores
+        required: true
+        schema:
+          type: string
+tags:
+  -
+    name: Endpoints
+    description: ''
