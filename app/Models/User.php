@@ -30,7 +30,7 @@ class User extends Authenticatable
         'email_verified_at',
         'status',
         'password',
-        'city_id'
+        'city_id','state_id','country_id'
     ];
 
     /**
@@ -41,8 +41,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'id',
+        'city_id',
+        'state_id',
+        'country_id'
     ];
 
+    protected $appends = [
+        'city', 'state', 'country'
+    ];
     /**
      * The attributes that should be cast.
      *
@@ -53,6 +60,27 @@ class User extends Authenticatable
     ];
 
     public function city(){
-        return $this->hasOne(City::class);
+        return $this->belongsTo(City::class);
     }
+
+    public function state(){
+        return $this->belongsTo(State::class);
+    }
+
+    public function country(){
+        return $this->belongsTo(Country::class);
+    }
+
+
+    public function getCityAttribute(){
+       return $this->city()->first() ? $this->city()->first()->name : null;
+    }
+
+    public function getStateAttribute(){
+        return $this->state()->first() ? $this->state()->first()->name : null;
+     }
+
+     public function getCountryAttribute(){
+        return $this->country()->first() ? $this->country()->first()->name : null;
+     }
 }

@@ -16,6 +16,13 @@ class Country extends Model
         'is_active',
     ];
 
+    protected $hidden = [
+        'created_at',
+        "deleted_at",
+        "updated_at",
+        'is_active',
+    ];
+
     public function states(){
         return $this->hasMany(State::class);
     }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\Location\Http\Controllers\LocationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,4 +16,10 @@ use Illuminate\Http\Request;
 
 Route::middleware('auth:api')->get('/location', function (Request $request) {
     return $request->user();
+});
+
+Route::prefix('location')->group(function () {
+    Route::get('countries', [LocationController::class, 'getAllCountries']);
+    Route::get('country/{id}', [LocationController::class, 'getCountry']);
+    Route::get('state/{id}', [LocationController::class, 'getState']);
 });

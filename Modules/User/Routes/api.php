@@ -16,19 +16,17 @@ use Spatie\Permission\Traits\HasRoles;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-Route::prefix('user')->group(function () {
-    
-    Route::post('register', [UserController::class, 'register']);
-    Route::get('profile/{id}', [UserController::class, 'userProfile'])->middleware('auth:api');
-    
+Route::middleware('auth:api')->prefix('user')->group(function () {
+    Route::get('profile/{id}', [UserController::class, 'userProfile']);
     Route::prefix('permissions')->group(function () {
-    Route::get('/', [PermissionController::class, 'getAllPermissions'])->middleware('auth:api');
-    Route::get('self', [PermissionController::class, 'getMyPermissions'])->middleware('auth:api');
-    Route::post('{action}', [PermissionController::class, 'assignRevokePermissions'])->middleware('auth:api');
-    
+        Route::get('/', [PermissionController::class, 'getAllPermissions']);
+        Route::get('self', [PermissionController::class, 'getMyPermissions']);
+        Route::post('{action}', [PermissionController::class, 'assignRevokePermissions']);
+        
+    });
 });
+Route::prefix('register')->group(function () {
+    Route::post('', [UserController::class, 'register']);  
+    Route::post('confirm_otp', [UserController::class, 'verifyEmail']);  
+    Route::post('resend_otp', [UserController::class, 'resendOtp']);  
 });
-

@@ -16,11 +16,19 @@ class State extends Model
         'is_active'
     ];
 
+    protected $hidden = [
+        'created_at',
+        "deleted_at",
+        "updated_at",
+        'is_active',
+        'country_id'
+    ];
+
     public function cities(){
         return $this->hasMany(City::class);
     }
 
     public function country(){
-        return $this->BelongsTo(Country::class);
+        return $this->belongsTo(Country::class);
     }
 }

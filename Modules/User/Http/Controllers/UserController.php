@@ -2,6 +2,9 @@
 
 namespace Modules\User\Http\Controllers;
 
+use App\Http\Services\NotificationService;
+use App\Http\Services\OtpService;
+use App\Http\Services\UserService;
 use App\Models\User;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -39,8 +42,13 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'full_name' => 'required|string',
+            'username' => 'required|string',
             'email' => 'required|email|unique:users',
+            'phone' => 'required|string|unique:users',
+            'city_id' => 'integer',
+            'state_id' => 'integer',
+            'country_id' => 'required|integer',
             'password' => [
                 'required',
                 'string',
@@ -48,7 +56,7 @@ class UserController extends Controller
                     ->mixedCase()
                     ->numbers()
                     ->symbols()
-                    ->uncompromised()
+                    // ->uncompromised()
             ]
         ]);
 
@@ -57,27 +65,79 @@ class UserController extends Controller
         }
 
         $input = $request->all();
-        $input['password'] = Hash::make($input['password']);
-        try {
-            $user = User::create($input);
-        } catch (\Exception $e) {
-            Log::error("Error occur while creating this account " . $request->input('email') . json_encode($e));
-            return response()->json(['status' => false, 'message' => 'Error occured while creating account', 'data' => null], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        try {
-            /**Generate user accessToken **/
-            $data['user'] =  $user;
-            $data['token'] = $user->createToken('authToken')->plainTextToken;
+        
+        $create_record = UserService::register($input['full_name'], $input['username'], $input['email'], $input['phone'], $input['city_id'], $input['state_id'], $input['country_id'],$input['password']);
+       if(!$create_record){
+        return response()->json(['status' => false, 'message' => 'Error occured while while creating account', 'data' => null], Response::HTTP_INTERNAL_SERVER_ERROR);
+       }
 
-            return response()->json(['status' => true, 'message' => 'Account created successfully!', 'data' => $data], Response::HTTP_OK);
-        } catch (\Exception $e) {
-            Log::error("Error occur while generating token for created account " . $request->input('email') . json_encode($e));
-            return response()->json(['status' => false, 'message' => 'Error occured while while generating token for created account', 'data' => null], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+       //send OTP to email for email verification
+       $send_otp = OtpService::generateOtp($create_record->id, $input['email']);
+
+       if(!$send_otp[0]){
+        return response()->json(['status' => false, 'message' => 'Error occured while sending otp ', 'data' => null], Response::HTTP_INTERNAL_SERVER_ERROR);
+       }
+
+        return response()->json(['status' => true, 'message' => 'Account created successfully. An OTP has been sent to your email.', 'data' => $create_record], Response::HTTP_OK);
     }
     
 
+    public static function verifyEmail(Request $request){
+        $validator = Validator::make($request->all(), [
+            'otp' => 'required',
+            'email' => 'required|email',
+        ]);
 
+        if ($validator->fails()) {
+            return response(['status' => false, 'message' => 'Validation errors. ' .  $validator->errors(), 'data'=>false], 422);
+        }
+        
+        $input = $request->all();
+        $email = $input['email'];
+        $otp = trim($input['otp']);
+         
+        $verify = OTPService::verifyOtp($email, $otp);
+
+        if(!$verify[0]){
+            return response(['status' => false, 'message' => $verify[1] , 'data'=>false], 422);
+        }
+
+        //update user
+        try{
+            $user = User::where('email', $email)->first();
+            $user->email_verified = true;
+            $user->email_verified_at = now();
+            $user->update();
+        }catch(\Exception $e){
+            Log::error($e);
+            return response(['status' => false, 'message' => 'error encountered while updating user record.' , 'data'=>false], 422);
+        }
+        NotificationService::Email($user->email, 'Your email has been successfully verified. You can now proceed to login account');
+        return response(['status' => true, 'message' => $verify[1] , 'data'=>true], 200);
+
+    }
+
+    public function resendOtp(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response(['status' => false, 'message' => 'Validation errors. ' .  $validator->errors(), 'data'=>false], 422);
+        }
+        
+        $input = $request->all();
+        $email = $input['email'];        
+         
+        $resend = UserService::resendOtp($email);
+
+        if(!$resend[0]){
+            return response(['status' => false, 'message' => $resend[1] , 'data'=>false], 422);
+        }
+
+        return response(['status' => true, 'message' => "OTP code sent to " . $resend[1] , 'data'=>true], 200);
+
+    }
     /**
      * Endpoint to show authenticated user profile.
      * @Response

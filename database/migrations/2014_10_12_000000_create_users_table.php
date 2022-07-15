@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('phone')->unique();
             $table->string('email')->unique();
-            $table->string('age')->unique();
+            $table->string('age')->nullable();
             $table->string('gender')->nullable();
             $table->string('interest')->nullable();
             $table->boolean('email_verified')->default(false);
